@@ -16,5 +16,8 @@ ${OBJS}: main.cpp Particle.cpp Particle.h utility.h
 clean:
 	rm -f *.o *~ *.out PSO
 
+fs : fs.cpp
+	g++ fs.cpp -o fs
+
 
 

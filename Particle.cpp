@@ -5,6 +5,7 @@
 #include <cstdio>
 #include <random>
 #include <limits>
+#include <cmath>
 
 x_y get_end_tip(Particle* p)
 { 
@@ -87,13 +88,25 @@ void Particle::set_gbest(Particle* swarm,unsigned int particle_num)
   {
     double gbest_fitness = distance(get_end_tip(Particle::gbest),target);
   }
+  // printf("!!!set gbest start!, current gbest = %f\n",gbest_fitness);
   for(int ii = 0 ; ii != particle_num ; ii++)
   {
-    if(swarm[ii].fitness < gbest_fitness)
+    printf("~~~~~~~swarm[%d].fitness = %f < gbest_fitness = %f \n",ii,swarm[ii].fitness,gbest_fitness);
+
+    if( swarm[ii].fitness - gbest_fitness < 0.0001)
     {
+      printf("i'm coming~~~~\n");
       //copy xij
-      *Particle::gbest = swarm[ii];
+      *(Particle::gbest) = swarm[ii];
+      printf("%s\n", Particle::gbest->a1 == swarm[ii].a1 ? "same" : "different");
+      printf("%s\n", Particle::gbest->a1 == swarm[ii].a1 ? "same" : "different");
+      printf("%s\n", Particle::gbest->a1 == swarm[ii].a1 ? "same" : "different");
+      printf("%s\n", Particle::gbest->a1 == swarm[ii].a1 ? "same" : "different");
+      gbest_fitness = distance(get_end_tip(Particle::gbest),target);
     }
+      // printf("gbest is at (%f,%f,%f,%f)\n",
+         // Particle::gbest->a1,Particle::gbest->a2,Particle::gbest->a3,Particle::gbest->d2);
+
   }
 }
 
@@ -116,19 +129,19 @@ void Particle::set_boundary(x_y a1_b,
 static int count = 0;
 void Particle::searching(double r1,double r2)
 {
-  //update vij
+  //1. update vij
   assert(pbest != NULL);
   assert(gbest != NULL);
   a1_dot = w*a1_dot + c1*r1*(pbest->a1 - a1) + c2*r2*(gbest->a1 - a1);
   a2_dot = w*a2_dot + c1*r1*(pbest->a2 - a2) + c2*r2*(gbest->a2 - a2);
   a3_dot = w*a3_dot + c1*r1*(pbest->a3 - a3) + c2*r2*(gbest->a3 - a3);
   d2_dot = w*d2_dot + c1*r1*(pbest->d2 - d2) + c2*r2*(gbest->d2 - d2);
-  //update xij
+  //2. update xij
   a1 = a1+a1_dot;
   a2 = a2+a2_dot;
   a3 = a3+a3_dot;
   d2 = d2+d2_dot;
-  //check whether out of boundary
+  //3. check whether out of boundary
   bool mask_a1,mask_a2,mask_a3,mask_d2;
   mask_a1 = a1 > a1_ub || a1 < a1_lb;
   mask_a2 = a2 > a2_ub || a2 < a2_lb;
@@ -137,7 +150,7 @@ void Particle::searching(double r1,double r2)
 
   if( mask_a1|| mask_a2 || mask_a3 || mask_d2)
   { 
-    printf("out of boundary!! : %d\n",count++);
+    //printf("out of boundary!! : %d\n",count++);
     this->a1 = uniRand(generator)*PI;
     this->a2 = uniRand(generator)*PI;
     this->a3 = uniRand(generator)*PI;
@@ -150,8 +163,9 @@ void Particle::searching(double r1,double r2)
 */  }
 
 
-  //evaluate and update fitness, update pbest
+  //4. update fitness 
   double fitness = distance(get_end_tip(this),Particle::target);
+  //5. update pbest
   if( fitness < this->fitness )
   { /*copy xij form this to pbest */
     *pbest = *this;

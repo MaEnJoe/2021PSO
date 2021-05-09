@@ -7,7 +7,7 @@
 
 
 #define PI 3.1415926
-#define NUM_PARTICLES 7000
+#define NUM_PARTICLES 30
    
 Particle* swarm;
 
@@ -39,6 +39,9 @@ void cheating(Particle* p)
   p->a3 = 0;
   p->d2 = 1;
   *(p->pbest) = *p;
+  x_y cc = get_end_tip(p);
+  double fitness = distance(cc,{2,1});
+  p->fitness = fitness;
 }
 
 int main(int argc, char** argv)
@@ -48,15 +51,23 @@ int main(int argc, char** argv)
 
     //this is cheating
   cheating(&swarm[0]);
-  x_y cc = get_end_tip(&swarm[0]);
+  printf("-----------------------------------------\n");
   Particle::set_gbest(swarm,NUM_PARTICLES);
-  printf("cheat = %f,%f,%f,%f\n", swarm[0].a1,swarm[0].a2,swarm[0].a3,swarm[0].d2);  
+  x_y cc = get_end_tip(&swarm[0]);
+  printf("cheat is at (%f,%f,%f,%f)\n", swarm[0].a1,swarm[0].a2,swarm[0].a3,swarm[0].d2);  
 
+  x_y end_tip1 = get_end_tip(Particle::gbest);
+  printf("gbest is at (%f,%f,%f,%f)\n\t\tarm is at (%f,%f)\n",
+         Particle::gbest->a1,Particle::gbest->a2,Particle::gbest->a3,Particle::gbest->d2,end_tip1.x,end_tip1.y);
+  cc = get_end_tip(Particle::gbest);
   double fitness = distance(cc,{2,1});
+  printf("~~~~%f\n",fitness );
+
+
   // printf("\t\t\t%f,%f, fitness = %f\n",cc.x,cc.y,fitness );
 
 
-  for(int iter = 0 ; iter != 10 ; iter++)
+  for(int iter = 0 ; iter != 1 ; iter++)
   {
     double r1,r2;
     r1 = uniRand(generator);
