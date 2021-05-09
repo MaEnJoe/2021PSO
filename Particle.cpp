@@ -9,17 +9,18 @@
 
 x_y get_end_tip(Particle* p)
 { 
- static const double d1 = 1;
- static const double d3 = 1;
+  const double d1 = 1;
+  const double d3 = 1;
  double x,y;
  x = d1*cos(p->a1)+p->d2*cos(p->a1+p->a2)+d3*cos(p->a1+p->a2+p->a3);
  y = d1*sin(p->a1)+p->d2*sin(p->a1+p->a2)+d3*sin(p->a1+p->a2+p->a3);  
  return {x,y};
 }
 
-inline double distance(x_y p,x_y target)
+double distance(x_y p,x_y target)
 {
   double dist = hypot(p.x-target.x,p.y-target.y);
+  //printf("p = (%f,%f)\n",p.x,p.y);
   return dist;
 }
 
@@ -30,15 +31,15 @@ static std::uniform_real_distribution<float> uniRand(-1, 1);
 
 
 /*static variable*/
-Particle* Particle::gbest;
-double Particle::a1_ub;
-double Particle::a2_ub;
-double Particle::a3_ub;
-double Particle::d2_ub;
-double Particle::a1_lb;
-double Particle::a2_lb;
-double Particle::a3_lb;
-double Particle::d2_lb;
+Particle* Particle::gbest = NULL;
+double Particle::a1_ub = 0.0;
+double Particle::a2_ub = 0.0;
+double Particle::a3_ub = 0.0;
+double Particle::d2_ub = 0.0;
+double Particle::a1_lb = 0.0;
+double Particle::a2_lb = 0.0;
+double Particle::a3_lb = 0.0;
+double Particle::d2_lb = 0.0;
 x_y Particle::target;
 
 double factor = 0.01;
@@ -57,16 +58,17 @@ Particle::Particle()
   this->d2_dot = uniRand(generator)*factor;
 
   this->fitness = distance(get_end_tip(this),target);
-  pbest = new Particle(this->a1,this->a2,this->a3,this->d2);
+  pbest = new Particle(this->a1,this->a2,this->a3,this->d2,this->fitness);
 }
 
 /*for creating pbest*/
-Particle::Particle(double a1,double a2,double a3,double d2)
+Particle::Particle(double a1,double a2,double a3,double d2,double fitness)
 {
   this->a1 = a1;
   this->a2 = a2;
   this->a3 = a3;
   this->d2 = d2;
+  this->fitness = fitness;
 }
 Particle::~Particle()
 {
@@ -81,28 +83,42 @@ void Particle::set_gbest(Particle* swarm,unsigned int particle_num)
   if(gbest == NULL)
   {
     double realbig = std::numeric_limits<double>::max();
-    gbest = new Particle(realbig,realbig,realbig,realbig);
-    gbest_fitness = realbig;
+    gbest = new Particle(realbig,realbig,realbig,realbig,realbig);
   }
   else
   {
-    double gbest_fitness = distance(get_end_tip(Particle::gbest),target);
+     gbest_fitness = Particle::gbest->fitness;
+    //distance(get_end_tip(Particle::gbest),target);
   }
+  
   // printf("!!!set gbest start!, current gbest = %f\n",gbest_fitness);
   for(int ii = 0 ; ii != particle_num ; ii++)
   {
-    printf("~~~~~~~swarm[%d].fitness = %f < gbest_fitness = %f \n",ii,swarm[ii].fitness,gbest_fitness);
 
+   //   printf("~~~~~~~swarm[%d].fitness = %f < gbest_fitness = %f \n",ii,swarm[ii].fitness,gbest_fitness);
     if( swarm[ii].fitness - gbest_fitness < 0.0001)
     {
       printf("i'm coming~~~~\n");
+      printf("~~~~~~~swarm[%d].fitness = %f < gbest_fitness = %f \n",ii,swarm[ii].fitness,gbest_fitness);
       //copy xij
-      *(Particle::gbest) = swarm[ii];
-      printf("%s\n", Particle::gbest->a1 == swarm[ii].a1 ? "same" : "different");
-      printf("%s\n", Particle::gbest->a1 == swarm[ii].a1 ? "same" : "different");
-      printf("%s\n", Particle::gbest->a1 == swarm[ii].a1 ? "same" : "different");
-      printf("%s\n", Particle::gbest->a1 == swarm[ii].a1 ? "same" : "different");
-      gbest_fitness = distance(get_end_tip(Particle::gbest),target);
+      Particle::gbest->a1 = swarm[ii].a1;
+      Particle::gbest->a2 = swarm[ii].a2;
+      Particle::gbest->a3 = swarm[ii].a3;
+      Particle::gbest->d2 = swarm[ii].d2;
+      Particle::gbest->fitness = swarm[ii].fitness;
+      gbest_fitness = Particle::gbest->fitness;
+//      distance(get_end_tip(Particle::gbest),Particle::target);
+
+      //double gbest_fitness1 = distance(get_end_tip(&swarm[ii]),Particle::target);
+     // x_y p = get_end_tip(&swarm[ii]);
+      //printf("p = (%f,%f)\n",p.x,p.y);
+      
+      printf("swarm fitness is %f\n",swarm[ii].fitness );
+      printf("update fitness to %f\n",gbest_fitness);
+
+
+
+      //printf("update fitness1 to %f\n",gbest_fitness1);
     }
       // printf("gbest is at (%f,%f,%f,%f)\n",
          // Particle::gbest->a1,Particle::gbest->a2,Particle::gbest->a3,Particle::gbest->d2);
@@ -164,13 +180,12 @@ void Particle::searching(double r1,double r2)
 
 
   //4. update fitness 
-  double fitness = distance(get_end_tip(this),Particle::target);
+  this->fitness = distance(get_end_tip(this),Particle::target);
   //5. update pbest
-  if( fitness < this->fitness )
+  if( this->fitness < this->pbest->fitness)
   { /*copy xij form this to pbest */
     *pbest = *this;
   }
-  this->fitness = fitness;
 }
 
 void Particle::set_target(x_y target)
@@ -178,3 +193,12 @@ void Particle::set_target(x_y target)
   Particle::target = target;
 }
 
+/*Particle Particle::operator=(const Particle& rval)
+{
+  printf("a1 = %f\n",this->a1);
+  this->a1 = rval.a1; 
+  this->a2 = rval.a2;
+  this->a3 = rval.a3;
+  this->d2 = rval.d2;
+  this->fitness = rval.fitness;
+}*/

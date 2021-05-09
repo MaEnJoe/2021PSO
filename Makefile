@@ -7,6 +7,9 @@ PROGRAMNAME = a.out
 
 all:${PROGRAMNAME}
 
+run : ${PROGRAMNAME}
+	./$<
+
 ${PROGRAMNAME}: ${OBJS}
 	${CXX} ${OBJS} -o $@
 
