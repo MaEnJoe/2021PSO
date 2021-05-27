@@ -4,22 +4,22 @@
 #include <random>
 #include "Particle.h"
 #include "utility.h"
-
+#include <ctime>
 
 #define PI 3.1415926
-#define NUM_PARTICLES 30
-   
+#define NUM_PARTICLES 10
+#define ITERATION 10000
 Particle* swarm;
+x_y target;
 
 std::random_device rd;
 std::mt19937 generator(rd());
 std::uniform_real_distribution<float> uniRand(0, 1);
 
-static Particle ppp;
 
 x_y get_end_tip(Particle* p);
 double distance(x_y p,x_y target);
-
+bool isConverge(x_y,x_y);
 
 void init()
 {
@@ -36,10 +36,14 @@ int main(int argc, char** argv)
 {
   init();
   //set target
-  Particle::set_target({0,2});
-    
+  target = {3,3};
+  Particle::set_target(target);
+  x_y end_tip;
+
+  clock_t t1 = clock();  
   /*ITERATE*/
-  for(int iter = 0 ; iter != 100000 ; iter++)
+  int iter;
+  for(iter = 0 ; iter != ITERATION ; iter++)
   {
     double r1,r2;
     r1 = uniRand(generator);
@@ -50,12 +54,23 @@ int main(int argc, char** argv)
       swarm[i].searching(r1,r2);
     }
     Particle::set_gbest(swarm,NUM_PARTICLES);
+    end_tip = get_end_tip(Particle::gbest);
+    if(isConverge(end_tip,target))
+      break;
   }
-
-  x_y end_tip = get_end_tip(Particle::gbest);
+  clock_t t2 = clock();
+  
+  end_tip = get_end_tip(Particle::gbest);
   printf("gbest is at (%f,%f,%f,%f)\n arm is at (%f,%f)\n",
          Particle::gbest->a1,Particle::gbest->a2,Particle::gbest->a3,Particle::gbest->d2,end_tip.x,end_tip.y);
   printf("fitness(sol) is : %f\n",Particle::gbest->fitness);
-
+  printf("time collapsed: %1.5f\n",(t2-(double)t1)/CLOCKS_PER_SEC);
+  printf("%s\n",(isConverge(end_tip,target)?"convergent":"divergent"));
+  printf("ITER = %d\n",iter);
   return 0;   
+}
+bool isConverge(x_y p,x_y target)
+{
+//  printf("manhatan distance =  %f\n",((p.x-target.x)+(p.y-target.y)));
+  return (fabs(p.x-target.x)+fabs(p.y-target.y)) < 0.01;
 }

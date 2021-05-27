@@ -94,11 +94,7 @@ void Particle::set_gbest(Particle* swarm,unsigned int particle_num)
     if( swarm[ii].fitness - gbest_fitness < 0.0001)
     {
       //copy xij
-      Particle::gbest->a1 = swarm[ii].a1;
-      Particle::gbest->a2 = swarm[ii].a2;
-      Particle::gbest->a3 = swarm[ii].a3;
-      Particle::gbest->d2 = swarm[ii].d2;
-      Particle::gbest->fitness = swarm[ii].fitness;
+      *Particle::gbest = swarm[ii];
       gbest_fitness = Particle::gbest->fitness;
     }
   }

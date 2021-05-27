@@ -28,7 +28,6 @@ public:
   void searching(double r1,double r);
   void update_pbest();
 
-
   static void set_boundary(x_y a1_b,x_y a2_b,x_y a3_b,x_y d2_b);
   static void set_target(x_y target);
   static void set_gbest(Particle* swarm,unsigned int particle_num);
