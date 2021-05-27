@@ -7,6 +7,9 @@
 #include <limits>
 #include <cmath>
 
+#define debugf(a) printf(#a" = %f\n",a);
+#define debugi(a) printf(#a" = %d\n",a);
+
 x_y get_end_tip(Particle* p)
 { 
   const double d1 = 1;
@@ -47,20 +50,19 @@ double factor = 0.01;
 Particle::Particle()
 {
   this->a1 = uniRand(generator)*PI;
-  this->a2 = uniRand(generator)*PI;
-  this->a3 = uniRand(generator)*PI;
+  this->a2 = uniRand(generator)*PI/2;
+  this->a3 = uniRand(generator)*PI/2;
   this->d2 = uniRand(generator) + 2;
 
   this->a1_dot = uniRand(generator)*factor;
   this->a2_dot = uniRand(generator)*factor;
   this->a3_dot = uniRand(generator)*factor;
   this->d2_dot = uniRand(generator)*factor;
-
   this->fitness = distance(get_end_tip(this),target);
   pbest = new Particle(this->a1,this->a2,this->a3,this->d2,this->fitness);
 }
 
-/*for creating pbest*/
+/*for creating pbest and gbest*/
 Particle::Particle(double a1,double a2,double a3,double d2,double fitness)
 {
   this->a1 = a1;
@@ -81,8 +83,12 @@ void Particle::set_gbest(Particle* swarm,unsigned int particle_num)
   double gbest_fitness;
   if(gbest == NULL)
   {
+    double a1_ = uniRand(generator)*PI;
+    double a2_ = uniRand(generator)*PI/2;
+    double a3_ = uniRand(generator)*PI/2;
+    double d2_ = uniRand(generator) + 2;
     double realbig = std::numeric_limits<double>::max();
-    gbest = new Particle(realbig,realbig,realbig,realbig,realbig);
+    gbest = new Particle(a1_,a2_,a3_,d2_,realbig);
     return;
   }
   else
@@ -91,7 +97,7 @@ void Particle::set_gbest(Particle* swarm,unsigned int particle_num)
   }
   for(int ii = 0 ; ii != particle_num ; ii++)
   {
-    if( swarm[ii].fitness - gbest_fitness < 0.0001)
+    if( swarm[ii].fitness < gbest_fitness )
     {
       //copy xij
       *Particle::gbest = swarm[ii];
@@ -131,6 +137,7 @@ void Particle::searching(double r1,double r2)
   a2 = a2+a2_dot;
   a3 = a3+a3_dot;
   d2 = d2+d2_dot;
+
   //3. check whether out of boundary
   bool mask_a1,mask_a2,mask_a3,mask_d2;
   mask_a1 = a1 > a1_ub || a1 < a1_lb;
@@ -141,8 +148,8 @@ void Particle::searching(double r1,double r2)
   if( mask_a1|| mask_a2 || mask_a3 || mask_d2)
   { 
     this->a1 = uniRand(generator)*PI;
-    this->a2 = uniRand(generator)*PI;
-    this->a3 = uniRand(generator)*PI;
+    this->a2 = uniRand(generator)*PI/2;
+    this->a3 = uniRand(generator)*PI/2;
     this->d2 = uniRand(generator) + 2;
   }
 

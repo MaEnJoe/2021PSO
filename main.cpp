@@ -7,7 +7,7 @@
 #include <ctime>
 
 #define PI 3.1415926
-#define NUM_PARTICLES 10
+#define NUM_PARTICLES 100
 #define ITERATION 10000
 Particle* swarm;
 x_y target;
@@ -55,17 +55,20 @@ int main(int argc, char** argv)
     }
     Particle::set_gbest(swarm,NUM_PARTICLES);
     end_tip = get_end_tip(Particle::gbest);
-    if(isConverge(end_tip,target))
+      
+    if(Particle::gbest->fitness < 0.01)
       break;
+    
+//    printf("\n");
+    printf("fitness = %.10f\n ", Particle::gbest->fitness);
   }
   clock_t t2 = clock();
-  
+  printf("\n"); 
   end_tip = get_end_tip(Particle::gbest);
   printf("gbest is at (%f,%f,%f,%f)\n arm is at (%f,%f)\n",
          Particle::gbest->a1,Particle::gbest->a2,Particle::gbest->a3,Particle::gbest->d2,end_tip.x,end_tip.y);
   printf("fitness(sol) is : %f\n",Particle::gbest->fitness);
   printf("time collapsed: %1.5f\n",(t2-(double)t1)/CLOCKS_PER_SEC);
-  printf("%s\n",(isConverge(end_tip,target)?"convergent":"divergent"));
   printf("ITER = %d\n",iter);
   return 0;   
 }

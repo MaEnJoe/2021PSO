@@ -3,8 +3,8 @@
 
 #include "utility.h"
 
-const double c1 = 0.1;//c1 coefficient of PSO
-const double c2 = 0.1;//c2 coefficient of PSO
+const double c1 = 0.05;//c1 coefficient of PSO
+const double c2 = 0.05;//c2 coefficient of PSO
 const double w = 0.05;//w coefficient of PSO
 
 class Particle
