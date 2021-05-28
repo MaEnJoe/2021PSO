@@ -25,6 +25,15 @@ double distance(x_y p,x_y target)
   double dist = hypot(p.x-target.x,p.y-target.y);
   return dist;
 }
+double evaluate(Particle* p,x_y target)
+{
+  double dist = distance(get_end_tip(p),target);
+  double energy_cost = (fabs(p->a1-Particle::a1_0)+
+                       fabs(p->a2-Particle::a2_0)+
+                       fabs(p->a3-Particle::a3_0)+
+                       fabs(p->d2-Particle::d2_0))*0.1;
+  return dist+energy_cost;
+}
 
 static double PI = 3.1415926;
 static std::random_device rd;
@@ -43,6 +52,10 @@ double Particle::a2_lb = 0.0;
 double Particle::a3_lb = 0.0;
 double Particle::d2_lb = 0.0;
 x_y Particle::target;
+double Particle::a1_0 = 999.0;
+double Particle::a2_0 = 999.0;
+double Particle::a3_0 = 999.0;
+double Particle::d2_0 = 999.0;
 
 double factor = 0.01;
 
@@ -58,8 +71,8 @@ Particle::Particle()
   this->a2_dot = uniRand(generator)*factor;
   this->a3_dot = uniRand(generator)*factor;
   this->d2_dot = uniRand(generator)*factor;
-  this->fitness = distance(get_end_tip(this),target);
-  pbest = new Particle(this->a1,this->a2,this->a3,this->d2,this->fitness);
+  this->fitness = evaluate(this,target);
+  this->pbest = new Particle(this->a1,this->a2,this->a3,this->d2,this->fitness);
 }
 
 /*for creating pbest and gbest*/
@@ -71,6 +84,19 @@ Particle::Particle(double a1,double a2,double a3,double d2,double fitness)
   this->d2 = d2;
   this->fitness = fitness;
 }
+Particle::Particle(double a1,double a2,double a3,double d2)
+{
+  this->a1 = a1;
+  this->a2 = a2;
+  this->a3 = a3;
+  this->d2 = d2;
+  this->a1_dot = uniRand(generator)*factor;
+  this->a2_dot = uniRand(generator)*factor;
+  this->a3_dot = uniRand(generator)*factor;
+  this->d2_dot = uniRand(generator)*factor;
+  this->fitness = evaluate(this,target);
+  this->pbest = new Particle(this->a1,this->a2,this->a3,this->d2,this->fitness);
+ }
 Particle::~Particle()
 {
   delete pbest;
@@ -122,12 +148,30 @@ void Particle::set_boundary(x_y a1_b,
   a3_lb = a3_b.x;
   d2_lb = d2_b.x;
 }
+/*static*/
+void Particle::set_initial_position(double a1_00,double a2_00,double a3_00,double d2_00,Particle* p)
+{
+  a1_0= a1_00;
+  a2_0= a2_00;
+  a3_0= a3_00;
+  d2_0= d2_00;
+
+  /*someone in the swarm must be at the initial position*/
+  Particle pp(a1_0,a2_0,a3_0,d2_0);
+  *p = pp;
+  /*make sure initila condition is not out of boundary*/  
+  assert(a1_0 <= a1_ub && a1_0 >= a1_lb);
+  assert(a2_0 <= a2_ub  && a2_0 >= a2_lb);
+  assert(a3_0 <= a3_ub  && a3_0 >= a3_lb);
+  assert(d2_0 <= d2_ub && d2_0 >= d2_lb);
+}
 static int count = 0;
 void Particle::searching(double r1,double r2)
 {
   //1. update vij
   assert(pbest != NULL);
   assert(gbest != NULL);
+  assert(a1_0 != 999.0 && "initail position is not set");
   a1_dot = w*a1_dot + c1*r1*(pbest->a1 - a1) + c2*r2*(gbest->a1 - a1);
   a2_dot = w*a2_dot + c1*r1*(pbest->a2 - a2) + c2*r2*(gbest->a2 - a2);
   a3_dot = w*a3_dot + c1*r1*(pbest->a3 - a3) + c2*r2*(gbest->a3 - a3);
@@ -155,7 +199,7 @@ void Particle::searching(double r1,double r2)
 
 
   //4. update fitness 
-  this->fitness = distance(get_end_tip(this),Particle::target);
+  this->fitness = evaluate(this,Particle::target);
   //5. update pbest
   if( this->fitness < this->pbest->fitness)
   { /*copy xij form this to pbest */

@@ -12,6 +12,7 @@ class Particle
 public:
   explicit Particle();
   explicit Particle(double a1,double a2,double a3,double d2,double fitness);
+  explicit Particle(double a1,double a2,double a3,double d2);
   ~Particle();
 
   //position
@@ -24,12 +25,14 @@ public:
   Particle *pbest;
   static Particle *gbest;
   static x_y target;
+  static double a1_0,a2_0,a3_0,d2_0;
 
   void searching(double r1,double r);
   void update_pbest();
 
   static void set_boundary(x_y a1_b,x_y a2_b,x_y a3_b,x_y d2_b);
   static void set_target(x_y target);
+  static void set_initial_position(double,double,double,double,Particle*);
   static void set_gbest(Particle* swarm,unsigned int particle_num);
   
   //Particle operator=(const Particle& rval);
