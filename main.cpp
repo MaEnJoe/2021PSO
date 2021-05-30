@@ -19,7 +19,6 @@ std::uniform_real_distribution<float> uniRand(0, 1);
 
 x_y get_end_tip(Particle* p);
 double distance(x_y p,x_y target);
-bool isConverge(x_y,x_y);
 
 void init()
 {
@@ -34,7 +33,7 @@ void init()
 int main(int argc, char** argv)
 {
   init();
-  //set target
+  /*set target*/
   target = {2,3};
   Particle::set_target(target);
   Particle::set_initial_position(0,0,PI/2,1,&swarm[0]);
@@ -53,8 +52,9 @@ int main(int argc, char** argv)
     {
       swarm[i].searching(r1,r2);
     }
-    Particle::set_gbest(swarm,NUM_PARTICLES);
-    end_tip = get_end_tip(Particle::gbest);
+    bool isConverge = Particle::set_gbest(swarm,NUM_PARTICLES);
+    if(isConverge)
+        break;
       
   }
   clock_t t2 = clock();
@@ -66,9 +66,4 @@ int main(int argc, char** argv)
   printf("time elapsed: %1.5f\n",(t2-(double)t1)/CLOCKS_PER_SEC);
   printf("ITER = %d\n",iter);
   return 0;   
-}
-bool isConverge(x_y p,x_y target)
-{
-//  printf("manhatan distance =  %f\n",((p.x-target.x)+(p.y-target.y)));
-  return (fabs(p.x-target.x)+fabs(p.y-target.y)) < 0.01;
 }

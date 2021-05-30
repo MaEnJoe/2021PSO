@@ -104,8 +104,14 @@ Particle::~Particle()
     delete gbest;
 }
 
-void Particle::set_gbest(Particle* swarm,unsigned int particle_num)
-{ 
+bool Particle::set_gbest(Particle* swarm,unsigned int particle_num)
+{
+  /*input: the swarm of the particles,the numnber of how many particle
+   output: return if converge. Convergence is determined by counter > 100,
+           if counter > 100: the gbest haven't been updated for 100 iteration
+  */
+  
+   
   double gbest_fitness;
   if(gbest == NULL)
   {
@@ -115,21 +121,29 @@ void Particle::set_gbest(Particle* swarm,unsigned int particle_num)
     double d2_ = uniRand(generator) + 2;
     double realbig = std::numeric_limits<double>::max();
     gbest = new Particle(a1_,a2_,a3_,d2_,realbig);
-    return;
+    return false;
   }
   else
   {
      gbest_fitness = Particle::gbest->fitness;
   }
+  static int counter = 0;
+  counter++;
   for(int ii = 0 ; ii != particle_num ; ii++)
   {
     if( swarm[ii].fitness < gbest_fitness )
     {
+      counter = 0;
       //copy xij
       *Particle::gbest = swarm[ii];
       gbest_fitness = Particle::gbest->fitness;
     }
   }
+  if(counter > 100)
+      return true;
+  else
+      return false;
+
 }
 
 

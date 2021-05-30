@@ -4,7 +4,7 @@
 #include "utility.h"
 
 const double c1 = 0.05;//c1 coefficient of PSO
-const double c2 = 0.05;//c2 coefficient of PSO
+const double c2 = 0.01;//c2 coefficient of PSO
 const double w = 0.05;//w coefficient of PSO
 
 class Particle
@@ -33,7 +33,7 @@ public:
   static void set_boundary(x_y a1_b,x_y a2_b,x_y a3_b,x_y d2_b);
   static void set_target(x_y target);
   static void set_initial_position(double,double,double,double,Particle*);
-  static void set_gbest(Particle* swarm,unsigned int particle_num);
+  static bool set_gbest(Particle* swarm,unsigned int particle_num);
   
   //Particle operator=(const Particle& rval);
    
