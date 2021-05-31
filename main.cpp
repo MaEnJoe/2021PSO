@@ -6,10 +6,12 @@
 #include "utility.h"
 #include <ctime>
 #include <omp.h>
+#include "common/CycleTimer.h"
 
 #define PI 3.1415926
 #define NUM_PARTICLES 10000
 #define ITERATION 10000
+#define THREAD_NUM 1
 Particle* swarm;
 x_y target;
 
@@ -40,31 +42,34 @@ int main(int argc, char** argv)
   Particle::set_initial_position(0,0,PI/2,1,&swarm[0]);
   x_y end_tip;
 
-  clock_t t1 = clock();  
+  double start,end;
+  start = CycleTimer::currentSeconds();
+  omp_set_num_threads(THREAD_NUM); 
   /*ITERATE*/
-  int iter;
+  int iter;  
   for(iter = 0 ; iter != ITERATION ; iter++)
   {
     double r1,r2;
     r1 = uniRand(generator);
     r2 = uniRand(generator);
-
-    for(int i = 0 ; i != NUM_PARTICLES; i++)
+    
+    #pragma omp parallel for
+    for(int i = 0 ; i < NUM_PARTICLES; i++)
     {
       swarm[i].searching(r1,r2);
     }
     bool isConverge = Particle::set_gbest(swarm,NUM_PARTICLES);
     if(isConverge)
         break;
-      
+     
   }
-  clock_t t2 = clock();
+  end = CycleTimer::currentSeconds();
   printf("\n"); 
   end_tip = get_end_tip(Particle::gbest);
   printf("gbest is at (%f,%f,%f,%f)\n arm is at (%f,%f)\n",
          Particle::gbest->a1,Particle::gbest->a2,Particle::gbest->a3,Particle::gbest->d2,end_tip.x,end_tip.y);
   printf("fitness(sol) is : %f\n",Particle::gbest->fitness);
-  printf("time elapsed: %1.5f\n",(t2-(double)t1)/CLOCKS_PER_SEC);
+  printf("time elapsed: %2.5f\n",end-start);
   printf("ITER = %d\n",iter);
   return 0;   
 }
