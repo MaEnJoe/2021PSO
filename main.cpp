@@ -5,6 +5,7 @@
 #include "Particle.h"
 #include "utility.h"
 #include <ctime>
+#include <omp.h>
 
 #define PI 3.1415926
 #define NUM_PARTICLES 10000

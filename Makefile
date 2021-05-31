@@ -1,5 +1,6 @@
 CXX = g++
-CXXFLAG = -std=c++11
+CXXFLAG = -std=c++17 -fopenmp -O3 -lm
+CLINFLAG = -fopenmp
 OBJS = Particle.o \
 	   main.o
 
@@ -11,7 +12,7 @@ run : ${PROGRAMNAME}
 	./$<
 
 ${PROGRAMNAME}: ${OBJS}
-	${CXX} ${OBJS} -o $@
+	${CXX} ${CLINFLAG} ${OBJS} -o $@
 
 ${OBJS}: main.cpp Particle.cpp Particle.h utility.h
 	${CXX} ${CXXFLAG} -c Particle.cpp main.cpp
@@ -21,6 +22,3 @@ clean:
 
 fs : fs.cpp
 	g++ fs.cpp -o fs
-
-
-
