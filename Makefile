@@ -21,4 +21,4 @@ clean:
 	rm -f *.o *~ *.out PSO
 
 fs : fs.cpp
-	g++ fs.cpp -o fs
+	g++ fs.cpp -o fs -fopenmp

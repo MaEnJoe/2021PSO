@@ -97,12 +97,6 @@ Particle::Particle(double a1,double a2,double a3,double d2)
   this->fitness = evaluate(this,target);
   this->pbest = new Particle(this->a1,this->a2,this->a3,this->d2,this->fitness);
  }
-Particle::~Particle()
-{
-  delete pbest;
-  if(!gbest)
-    delete gbest;
-}
 
 bool Particle::set_gbest(Particle* swarm,unsigned int particle_num)
 {
@@ -172,6 +166,7 @@ void Particle::set_initial_position(double a1_00,double a2_00,double a3_00,doubl
 
   /*someone in the swarm must be at the initial position*/
   Particle pp(a1_0,a2_0,a3_0,d2_0);
+  assert(p != NULL);
   *p = pp;
   /*make sure initila condition is not out of boundary*/  
   assert(a1_0 <= a1_ub && a1_0 >= a1_lb);
@@ -226,6 +221,9 @@ void Particle::set_target(x_y target)
   Particle::target = target;
 }
 
+Particle::~Particle()
+{
+}
 /*Particle Particle::operator=(const Particle& rval)
 {
   printf("a1 = %f\n",this->a1);

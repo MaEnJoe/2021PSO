@@ -25,7 +25,7 @@ public:
   Particle *pbest;
   static Particle *gbest;
   static x_y target;
-  static double a1_0,a2_0,a3_0,d2_0;
+  static double a1_0,a2_0,a3_0,d2_0;//initial position
 
   void searching(double r1,double r);
   void update_pbest();
