@@ -65,7 +65,7 @@ Particle::Particle()
   this->a1 = uniRand(generator)*PI;
   this->a2 = uniRand(generator)*PI/2;
   this->a3 = uniRand(generator)*PI/2;
-  this->d2 = uniRand(generator) + 2;
+  this->d2 = uniRand(generator)*(d2_ub-d2_lb)/2 + (d2_ub+d2_lb)/2;
 
   this->a1_dot = uniRand(generator)*factor;
   this->a2_dot = uniRand(generator)*factor;
@@ -203,7 +203,7 @@ void Particle::searching(double r1,double r2)
     this->a1 = uniRand(generator)*PI;
     this->a2 = uniRand(generator)*PI/2;
     this->a3 = uniRand(generator)*PI/2;
-    this->d2 = uniRand(generator) + 2;
+    this->d2 = uniRand(generator)*(d2_ub-d2_lb)/2 + (d2_ub+d2_lb)/2;
   }
 
 

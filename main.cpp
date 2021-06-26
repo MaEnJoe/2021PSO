@@ -9,9 +9,10 @@
 #include "common/CycleTimer.h"
 
 #define PI 3.1415926
-#define NUM_PARTICLES 10000
+#define NUM_PARTICLES 16384
 #define ITERATION 10000
-#define THREAD_NUM 4
+#define printi(v) printf(#v" = %d\n",v);
+int THREAD_NUM = 6;
 Particle* swarm;
 x_y target;
 
@@ -27,21 +28,28 @@ void init()
     delete[] swarm;
     delete Particle::gbest;
   }
+  //set boundary
+  Particle::set_boundary({0,PI},{-PI/2,PI/2},{-PI/2,PI/2},{1,15});
   swarm = new Particle[NUM_PARTICLES];
   Particle::set_gbest(swarm,NUM_PARTICLES);
-  //set boundary
-  Particle::set_boundary({0,PI},{-PI/2,PI/2},{-PI/2,PI/2},{1,3});
 }
 
 
 int main(int argc, char** argv)
 {
-  target = {2,3};
+ 
+  if(argc > 1){
+    THREAD_NUM = atoi(argv[1]);
+  }
+
+  target = {6,4};
   Particle::set_target(target);
   double start,end,refTime,m1Time,m2Time;
   x_y end_tip;
+ 
   omp_set_num_threads(THREAD_NUM); 
   
+  printf("Number of threads: %d\n",THREAD_NUM );
   printf("parallel 1 starts: \n");
   init();
   Particle::set_initial_position(0,0,PI/2,1,&swarm[0]);
@@ -63,8 +71,8 @@ int main(int argc, char** argv)
       {
         swarm[i].searching(r1,r2);
       }
-      if(isConverge)
-          break;
+      //if(isConverge)
+      //    break;
       //#pragma omp barrier
       if(omp_get_thread_num() == 0)
         isConverge = Particle::set_gbest(swarm,NUM_PARTICLES);
@@ -75,12 +83,13 @@ int main(int argc, char** argv)
   m1Time = end-start;
   printf("\n"); 
   end_tip = get_end_tip(Particle::gbest);
+  /*
   printf("gbest is at (%f,%f,%f,%f)\n arm is at (%f,%f)\n",
          Particle::gbest->a1,Particle::gbest->a2,Particle::gbest->a3,Particle::gbest->d2,end_tip.x,end_tip.y);
   printf("fitness(sol) is : %f\n",Particle::gbest->fitness);
   printf("time elapsed: %2.5f\n",m1Time);
   printf("ITER = %d\n",counter);
-
+*/
   /*ITERATE 2 */
   printf("Serial starts: \n");
   init();
@@ -97,8 +106,8 @@ int main(int argc, char** argv)
     {
       swarm[i].searching(r1,r2);
     }
-    if(isConverge)
-        break;
+    //if(isConverge)
+    //    break;
     isConverge = Particle::set_gbest(swarm,NUM_PARTICLES);
   }
   end = CycleTimer::currentSeconds();
@@ -106,14 +115,14 @@ int main(int argc, char** argv)
 
   printf("\n"); 
   end_tip = get_end_tip(Particle::gbest);
+/*
   printf("gbest is at (%f,%f,%f,%f)\n arm is at (%f,%f)\n",
          Particle::gbest->a1,Particle::gbest->a2,Particle::gbest->a3,Particle::gbest->d2,end_tip.x,end_tip.y);
   printf("fitness(sol) is : %f\n",Particle::gbest->fitness);
   printf("time elapsed: %2.5f\n",refTime);
+*/
   printf("ITER = %d\n",counter2);
-
   printf("normalized Speedup = %f\n",refTime/m1Time*counter/counter2);
-
   return 0;   
 }
 double uniRand(int lb,int ub)

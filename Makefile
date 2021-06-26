@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAG = -std=c++17 -fopenmp -O3 -lm
+CXXFLAG = -std=c++17 -fopenmp -O3 -lm -g3
 CLINFLAG = -fopenmp
 OBJS = Particle.o \
 	   main.o
@@ -21,4 +21,4 @@ clean:
 	rm -f *.o *~ *.out PSO
 
 fs : fs.cpp
-	g++ fs.cpp -o fs -fopenmp
+	g++ fs.cpp -o fs 
