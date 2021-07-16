@@ -1,0 +1,1 @@
+Implement the classic favour of Parallel synchronous [Paricle Swarm Optimization](https://zh.wikipedia.org/wiki/%E7%B2%92%E5%AD%90%E7%BE%A4%E4%BC%98%E5%8C%96) with [OpenMP](https://zh.wikipedia.org/zh-tw/OpenMP)
